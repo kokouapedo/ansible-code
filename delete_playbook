@@ -1,0 +1,11 @@
+---
+- name: Remove package with yum
+  hosts: devserver  # Replace with the target server(s) where the package is installed
+  become: true
+
+  tasks:
+    - name: Remove package
+      yum:
+        name: httpd  # Replace with the name of the package you want to remove
+        state: absent
+

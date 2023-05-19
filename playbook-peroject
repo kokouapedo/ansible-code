@@ -1,0 +1,38 @@
+---
+- name: Deploy static-resume project
+  hosts: devserver  # Replace with the target server(s) where you want to deploy the project
+  become: true
+
+  tasks:
+    - name: Install necessary packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - unzip
+        - wget
+        - httpd
+
+    - name: Download project zip file
+      get_url:
+        url: "https://github.com/utrains/static-resume/archive/refs/heads/main.zip"
+        dest: "/tmp/main.zip"
+
+    - name: Unzip project
+      ansible.builtin.unarchive:
+        src: /tmp/main.zip
+        dest: /tmp
+        remote_src: true
+
+    - name: Copy project files to Apache document root
+      copy:
+        src: "/tmp/static-resume-main/iPortfolio/"
+        dest: "/var/www/html/"
+        remote_src: true
+
+    - name: Start Apache web server
+      service:
+        name: httpd
+        state: started
+        enabled: true
+
